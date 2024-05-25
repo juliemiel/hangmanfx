@@ -3,10 +3,17 @@ package pri.bashok.hangmanfx;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import pri.bashok.hangmanfx.command.Command;
 import pri.bashok.hangmanfx.command.DisableButtonCommand;
+import pri.bashok.hangmanfx.service.Hangman;
+
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class Controller {
 
@@ -89,15 +96,51 @@ public class Controller {
     private Button buttonZ;
 
     @FXML
+    private Label lblStatus;
+
+    @FXML
     private TextField textPlay;
 
     @FXML
-    private TextArea textScaffold;
+    private Rectangle attempt1;
 
-    private int maxAttempts = 7;
+    @FXML
+    private Circle attempt2;
+
+    @FXML
+    private Rectangle attempt3;
+
+    @FXML
+    private Rectangle attempt4;
+
+    @FXML
+    private Rectangle attempt5;
+
+    @FXML
+    private Rectangle attempt6;
+
+    @FXML
+    private Rectangle attempt7;
+
+    private ArrayList<Object> deadman;
+
+    private String nextWord;
+
+    private Hangman hangman;
 
     @FXML
     void initialize () {
+        // Load the wordslist file
+        try {
+            hangman = Hangman.build("en_list.txt");
+            fetchNextWord();
+        } catch (IOException e) {
+            System.out.println(e.getLocalizedMessage());
+            lblStatus.setText(e.getLocalizedMessage());
+        }
+        // Initialise the deadman attempts array
+        deadman = new ArrayList<>();
+        // Configure all alphabet buttons' onClick
         assignCommand(buttonQ, new DisableButtonCommand(buttonQ));
         assignCommand(buttonW, new DisableButtonCommand(buttonW));
         assignCommand(buttonE, new DisableButtonCommand(buttonE));
@@ -130,6 +173,17 @@ public class Controller {
         button.setOnAction(event -> command.execute());
     }
 
+    private void fetchNextWord() {
+        nextWord = hangman.selectNext();
+        System.out.println(nextWord);
+        if (null == nextWord) {
+            lblStatus.setText("You've reached the end of the game. Restart again.");
+        } else {
+            String display = new String(nextWord);
+            textPlay.setText(display.replaceAll("[a-zA-Z]", "_  "));
+            lblStatus.setText(display.length() + " characters long.");
+        }
+    }
     @FXML
     void getA(ActionEvent event) {
 

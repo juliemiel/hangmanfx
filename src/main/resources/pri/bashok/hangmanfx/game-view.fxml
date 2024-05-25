@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
 <VBox alignment="CENTER" prefHeight="400.0" prefWidth="600.0" spacing="20.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pri.bashok.hangmanfx.Controller">
    <children>
-      <AnchorPane prefHeight="402.0" prefWidth="600.0">
+      <AnchorPane prefHeight="400.0" prefWidth="441.0">
          <children>
             <Button fx:id="buttonA" layoutX="66.0" layoutY="19.0" mnemonicParsing="false" onAction="#getA" prefHeight="7.0" prefWidth="25.0" text="A">
                <font>
@@ -141,8 +143,17 @@
                   <Font size="11.0" />
                </font>
             </Button>
-            <TextArea fx:id="textScaffold" layoutX="135.0" layoutY="87.0" prefHeight="200.0" prefWidth="200.0" />
-            <TextField fx:id="textPlay" layoutX="67.0" layoutY="327.0" prefHeight="25.0" prefWidth="335.0" />
+            <TextField fx:id="textPlay" alignment="CENTER" editable="false" focusTraversable="false" layoutX="67.0" layoutY="327.0" prefHeight="25.0" prefWidth="335.0" />
+            <Label fx:id="lblStatus" layoutX="195.0" layoutY="352.0" prefHeight="17.0" prefWidth="200.0" text="Label" />
+            <Circle fx:id="attempt2" fill="#ff1f96" layoutX="313.0" layoutY="145.0" radius="29.0" stroke="BLACK" strokeType="INSIDE" visible="false" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="200.0" layoutX="134.0" layoutY="100.0" stroke="BLACK" strokeType="INSIDE" width="37.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="17.0" layoutX="135.0" layoutY="81.0" stroke="BLACK" strokeType="INSIDE" width="200.0" />
+            <Rectangle fx:id="attempt1" arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="17.0" layoutX="310.0" layoutY="98.0" stroke="BLACK" strokeType="INSIDE" visible="false" width="8.0" />
+            <Rectangle fx:id="attempt3" arcHeight="5.0" arcWidth="5.0" fill="#ff1f96" height="89.0" layoutX="301.0" layoutY="174.0" stroke="BLACK" strokeType="INSIDE" visible="false" width="25.0" />
+            <Rectangle fx:id="attempt5" arcHeight="5.0" arcWidth="5.0" fill="#ff1f96" height="9.0" layoutX="318.0" layoutY="196.0" rotate="62.5" stroke="BLACK" strokeType="INSIDE" visible="false" width="37.0" />
+            <Rectangle fx:id="attempt4" arcHeight="5.0" arcWidth="5.0" fill="#ff1f96" height="9.0" layoutX="270.0" layoutY="196.0" rotate="-57.8" stroke="BLACK" strokeType="INSIDE" visible="false" width="37.0" />
+            <Rectangle fx:id="attempt6" arcHeight="5.0" arcWidth="5.0" fill="#ff1f96" height="37.0" layoutX="296.0" layoutY="263.0" stroke="BLACK" strokeType="INSIDE" visible="false" width="14.0" />
+            <Rectangle fx:id="attempt7" arcHeight="5.0" arcWidth="5.0" fill="#ff1f96" height="37.0" layoutX="319.0" layoutY="263.0" stroke="BLACK" strokeType="INSIDE" visible="false" width="14.0" />
          </children>
       </AnchorPane>
    </children>
