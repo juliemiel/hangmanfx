@@ -3,6 +3,7 @@ package pri.bashok.hangmanfx.dict;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.nio.file.Paths;
 
 import static org.junit.Assert.*;
@@ -14,16 +15,20 @@ public class WordsListTest {
     public void init() {
         String path = Paths.get("src", "test", "resources", "en_list.txt")
                 .toString();
-        instance = WordsList.build(path);
+        try {
+            instance = WordsList.build(path);
+        } catch (IOException e) {
+
+        }
     }
 
     @Test
     public void testSelect() {
-        String selected = instance.selectRandom();
+        String selected = instance.selectNext();
         assertNotNull(selected);
         for (int i = 0; i < 8; i ++) {
-            instance.selectRandom();
+            instance.selectNext();
         }
-        assertNull(instance.selectRandom());
+        assertNull(instance.selectNext());
     }
 }
