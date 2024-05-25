@@ -1,4 +1,4 @@
-package pri.bashok.hangmanfx.dict;
+package pri.bashok.hangmanfx.service;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -9,14 +9,14 @@ import java.nio.file.Paths;
 import static org.junit.Assert.*;
 
 public class WordsListTest {
-    private WordsList instance;
+    private Hangman instance;
 
     @Before
     public void init() {
         String path = Paths.get("src", "test", "resources", "en_list.txt")
                 .toString();
         try {
-            instance = WordsList.build(path);
+            instance = Hangman.build(path);
         } catch (IOException e) {
 
         }

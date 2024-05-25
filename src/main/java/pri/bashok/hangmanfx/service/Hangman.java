@@ -1,4 +1,4 @@
-package pri.bashok.hangmanfx.dict;
+package pri.bashok.hangmanfx.service;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -12,19 +12,19 @@ import java.util.List;
  * A singleton that loads the list of words in the game, and uses Iterator pattern to randomise
  * Requires the data file to be present in the correct location
  */
-public class WordsList {
-    private static WordsList instance;
+public class Hangman {
+    private static Hangman instance;
     private final List<String> words;
     private Iterator<String> iterator;
 
-    private WordsList() {
+    private Hangman() {
         words = new ArrayList<>();
         iterator = Collections.emptyIterator();
     }
 
-    public static WordsList build(String file) throws IOException {
+    public static Hangman build(String file) throws IOException {
         if (instance == null) {
-            instance = new WordsList();
+            instance = new Hangman();
             instance.load(file);
         }
         return instance;
