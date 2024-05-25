@@ -1,21 +1,23 @@
 package pri.bashok.hangmanfx;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.image.ImageView;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
 import pri.bashok.hangmanfx.command.Command;
 import pri.bashok.hangmanfx.command.DisableButtonCommand;
 import pri.bashok.hangmanfx.service.Hangman;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Controller {
+
+    // private static final Logger logger = LoggerFactory.getLogger(ButtonEventHandlerController.class);
 
     @FXML
     private Button buttonA;
@@ -102,6 +104,12 @@ public class Controller {
     private TextField textPlay;
 
     @FXML
+    private Label lblLost;
+
+    @FXML
+    private Button buttonAgain;
+
+    @FXML
     private Rectangle attempt1;
 
     @FXML
@@ -122,15 +130,19 @@ public class Controller {
     @FXML
     private Rectangle attempt7;
 
-    private ArrayList<Object> deadman;
+    private int strikeCounter = 0;
 
-    private String nextWord;
+    private ArrayList<Shape> deadman;
+
+    private StringBuilder nextWord;
+
+    private char[] displayWord;
 
     private Hangman hangman;
 
     @FXML
     void initialize () {
-        // Load the wordslist file
+        // Load the wordslist file, and start with a word
         try {
             hangman = Hangman.build("en_list.txt");
             fetchNextWord();
@@ -139,179 +151,122 @@ public class Controller {
             lblStatus.setText(e.getLocalizedMessage());
         }
         // Initialise the deadman attempts array
-        deadman = new ArrayList<>();
-        // Configure all alphabet buttons' onClick
-        assignCommand(buttonQ, new DisableButtonCommand(buttonQ));
-        assignCommand(buttonW, new DisableButtonCommand(buttonW));
-        assignCommand(buttonE, new DisableButtonCommand(buttonE));
-        assignCommand(buttonR, new DisableButtonCommand(buttonR));
-        assignCommand(buttonT, new DisableButtonCommand(buttonT));
-        assignCommand(buttonY, new DisableButtonCommand(buttonY));
-        assignCommand(buttonU, new DisableButtonCommand(buttonU));
-        assignCommand(buttonI, new DisableButtonCommand(buttonI));
-        assignCommand(buttonO, new DisableButtonCommand(buttonO));
-        assignCommand(buttonP, new DisableButtonCommand(buttonP));
-        assignCommand(buttonA, new DisableButtonCommand(buttonA));
-        assignCommand(buttonS, new DisableButtonCommand(buttonS));
-        assignCommand(buttonD, new DisableButtonCommand(buttonD));
-        assignCommand(buttonF, new DisableButtonCommand(buttonF));
-        assignCommand(buttonG, new DisableButtonCommand(buttonG));
-        assignCommand(buttonH, new DisableButtonCommand(buttonH));
-        assignCommand(buttonJ, new DisableButtonCommand(buttonJ));
-        assignCommand(buttonK, new DisableButtonCommand(buttonK));
-        assignCommand(buttonL, new DisableButtonCommand(buttonL));
-        assignCommand(buttonZ, new DisableButtonCommand(buttonZ));
-        assignCommand(buttonX, new DisableButtonCommand(buttonX));
-        assignCommand(buttonC, new DisableButtonCommand(buttonC));
-        assignCommand(buttonV, new DisableButtonCommand(buttonV));
-        assignCommand(buttonB, new DisableButtonCommand(buttonB));
-        assignCommand(buttonN, new DisableButtonCommand(buttonN));
-        assignCommand(buttonM, new DisableButtonCommand(buttonM));
+        deadman = new ArrayList<>(); deadman.add(attempt1);
+        deadman.add(attempt2); deadman.add(attempt3); deadman.add(attempt4);
+        deadman.add(attempt5); deadman.add(attempt6); deadman.add(attempt7);
+        // Configure all alphabet buttons' onClick disable event
+        clickCommand(buttonQ, new DisableButtonCommand(buttonQ));
+        clickCommand(buttonW, new DisableButtonCommand(buttonW));
+        clickCommand(buttonE, new DisableButtonCommand(buttonE));
+        clickCommand(buttonR, new DisableButtonCommand(buttonR));
+        clickCommand(buttonT, new DisableButtonCommand(buttonT));
+        clickCommand(buttonY, new DisableButtonCommand(buttonY));
+        clickCommand(buttonU, new DisableButtonCommand(buttonU));
+        clickCommand(buttonI, new DisableButtonCommand(buttonI));
+        clickCommand(buttonO, new DisableButtonCommand(buttonO));
+        clickCommand(buttonP, new DisableButtonCommand(buttonP));
+        clickCommand(buttonA, new DisableButtonCommand(buttonA));
+        clickCommand(buttonS, new DisableButtonCommand(buttonS));
+        clickCommand(buttonD, new DisableButtonCommand(buttonD));
+        clickCommand(buttonF, new DisableButtonCommand(buttonF));
+        clickCommand(buttonG, new DisableButtonCommand(buttonG));
+        clickCommand(buttonH, new DisableButtonCommand(buttonH));
+        clickCommand(buttonJ, new DisableButtonCommand(buttonJ));
+        clickCommand(buttonK, new DisableButtonCommand(buttonK));
+        clickCommand(buttonL, new DisableButtonCommand(buttonL));
+        clickCommand(buttonZ, new DisableButtonCommand(buttonZ));
+        clickCommand(buttonX, new DisableButtonCommand(buttonX));
+        clickCommand(buttonC, new DisableButtonCommand(buttonC));
+        clickCommand(buttonV, new DisableButtonCommand(buttonV));
+        clickCommand(buttonB, new DisableButtonCommand(buttonB));
+        clickCommand(buttonN, new DisableButtonCommand(buttonN));
+        clickCommand(buttonM, new DisableButtonCommand(buttonM));
     }
 
-    private void assignCommand(Button button, Command command) {
-        button.setOnAction(event -> command.execute());
+    private void clickCommand(Button button, Command command) {
+        button.setOnAction(_ -> {
+                    handleGuess(button.getText().toLowerCase().charAt(0));
+                    command.execute();
+                }
+        );
+    }
+
+    private void handleGuess(char c) {
+        int indexRef = nextWord.toString().indexOf(c);
+        if (-1 == indexRef) {
+            strikeCounter ++;
+            lblStatus.setText("Oh! Oh! Only " + (deadman.size() - strikeCounter) + " strikes remain!");
+            deadman.get(strikeCounter - 1).setVisible(true);
+        } else {
+            lblStatus.setText("Yes! You guessed it right - " + c);
+            while (indexRef >= 0) {
+                displayWord[indexRef] = c;
+                indexRef = nextWord.toString().indexOf(c, indexRef + 1);
+            }
+            textPlay.setText(new String(displayWord).replaceAll("_", "_  "));
+        }
+        checkStrikes();
+    }
+
+    private void checkStrikes() {
+        if (strikeCounter >= deadman.size()) {
+            lblStatus.setText("You lose!!");
+            lblLost.setVisible(true);
+            lblLost.setText(nextWord.toString());
+            buttonAgain.setVisible(true);
+        } else if (hangman.isAMatch(nextWord.toString(), new String(displayWord))) {
+            lblStatus.setText("Yes! You won!! The hidden word is - " + nextWord.toString());
+            buttonAgain.setVisible(true);
+        }
     }
 
     private void fetchNextWord() {
-        nextWord = hangman.selectNext();
-        System.out.println(nextWord);
+        nextWord = new StringBuilder(hangman.selectNext());
+        // System.out.println(nextWord);
         if (null == nextWord) {
-            lblStatus.setText("You've reached the end of the game. Restart again.");
+            lblStatus.setText("You've reached the end of the game. Restart game again.");
         } else {
-            String display = new String(nextWord);
-            textPlay.setText(display.replaceAll("[a-zA-Z]", "_  "));
-            lblStatus.setText(display.length() + " characters long.");
+            displayWord = new char[nextWord.length()];
+            Arrays.fill(displayWord, '_');
+            textPlay.setText(new String(displayWord).replaceAll("_", "_  "));
+            lblStatus.setText(nextWord.length() + " characters long.");
         }
     }
-    @FXML
-    void getA(ActionEvent event) {
-
-    }
 
     @FXML
-    void getB(ActionEvent event) {
-
+    public void restart() {
+        strikeCounter = 0;
+        fetchNextWord();
+        lblLost.setVisible(false);
+        buttonAgain.setVisible(false);
+        buttonQ.setDisable(false);
+        buttonW.setDisable(false);
+        buttonE.setDisable(false);
+        buttonR.setDisable(false);
+        buttonT.setDisable(false);
+        buttonY.setDisable(false);
+        buttonU.setDisable(false);
+        buttonI.setDisable(false);
+        buttonO.setDisable(false);
+        buttonP.setDisable(false);
+        buttonA.setDisable(false);
+        buttonS.setDisable(false);
+        buttonD.setDisable(false);
+        buttonF.setDisable(false);
+        buttonG.setDisable(false);
+        buttonH.setDisable(false);
+        buttonJ.setDisable(false);
+        buttonK.setDisable(false);
+        buttonL.setDisable(false);
+        buttonZ.setDisable(false);
+        buttonX.setDisable(false);
+        buttonC.setDisable(false);
+        buttonV.setDisable(false);
+        buttonB.setDisable(false);
+        buttonN.setDisable(false);
+        buttonM.setDisable(false);
+        for (Shape shape : deadman) {
+            shape.setVisible(false);
+        }
     }
-
-    @FXML
-    void getC(ActionEvent event) {
-
-    }
-
-    @FXML
-    void getD(ActionEvent event) {
-
-    }
-
-    @FXML
-    void getE(ActionEvent event) {
-
-    }
-
-    @FXML
-    void getF(ActionEvent event) {
-
-    }
-
-    @FXML
-    void getG(ActionEvent event) {
-
-    }
-
-    @FXML
-    void getH(ActionEvent event) {
-
-    }
-
-    @FXML
-    void getI(ActionEvent event) {
-
-    }
-
-    @FXML
-    void getJ(ActionEvent event) {
-
-    }
-
-    @FXML
-    void getK(ActionEvent event) {
-
-    }
-
-    @FXML
-    void getL(ActionEvent event) {
-
-    }
-
-    @FXML
-    void getM(ActionEvent event) {
-
-    }
-
-    @FXML
-    void getN(ActionEvent event) {
-
-    }
-
-    @FXML
-    void getO(ActionEvent event) {
-
-    }
-
-    @FXML
-    void getP(ActionEvent event) {
-
-    }
-
-    @FXML
-    void getQ(ActionEvent event) {
-
-    }
-
-    @FXML
-    void getR(ActionEvent event) {
-
-    }
-
-    @FXML
-    void getS(ActionEvent event) {
-
-    }
-
-    @FXML
-    void getT(ActionEvent event) {
-
-    }
-
-    @FXML
-    void getU(ActionEvent event) {
-
-    }
-
-    @FXML
-    void getV(ActionEvent event) {
-
-    }
-
-    @FXML
-    void getW(ActionEvent event) {
-
-    }
-
-    @FXML
-    void getX(ActionEvent event) {
-
-    }
-
-    @FXML
-    void getY(ActionEvent event) {
-
-    }
-
-    @FXML
-    void getZ(ActionEvent event) {
-
-    }
-
 }

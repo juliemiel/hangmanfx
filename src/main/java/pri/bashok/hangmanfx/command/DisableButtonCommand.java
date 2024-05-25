@@ -11,8 +11,6 @@ public class DisableButtonCommand implements Command {
 
     @Override
     public void execute() {
-        if (!button.isDisabled()) {
-            button.setDisable(true);
-        }
+        button.setDisable(true);
     }
 }
