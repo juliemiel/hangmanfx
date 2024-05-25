@@ -1,8 +1,6 @@
 package pri.bashok.hangmanfx.service;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -31,7 +29,11 @@ public class Hangman {
     }
 
     private void load(String file) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(file));
+        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(file);
+        if (null == inputStream) {
+            throw new FileNotFoundException("File, " + file + " was not found.");
+        }
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         String line;
         while((line = reader.readLine()) != null) {
             words.add(line);
@@ -45,5 +47,9 @@ public class Hangman {
             return iterator.next();
         }
         return null;  // No more words left to play
+    }
+
+    public boolean isAMatch(String dictWord, String guessWord) {
+        return dictWord.equalsIgnoreCase(guessWord);
     }
 }
